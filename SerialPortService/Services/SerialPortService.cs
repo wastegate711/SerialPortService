@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace SerialPortService.Services
 {
-    public class SerialPortService : IDisposable, ISerialPortService
+    public class Serial_Port : IDisposable, ISerialPortService
     {
         private BaseSettings _settings;
         private Exception _rxException;
@@ -60,12 +60,12 @@ namespace SerialPortService.Services
         }
         #endregion
         #region Конструктор.
-        public SerialPortService()
+        public Serial_Port()
         {
             _settings = new BaseSettings();
         }
 
-        public SerialPortService(string portName) : this()
+        public Serial_Port(string portName) : this()
         {
             _settings.Port = portName;
         }
@@ -76,7 +76,7 @@ namespace SerialPortService.Services
             Close();
         }
 
-        ~SerialPortService()
+        ~Serial_Port()
         {
             Close();
         }
