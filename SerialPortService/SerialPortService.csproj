@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <PackageIcon>rs232.jpg</PackageIcon>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>West.SerialPortService</PackageId>
+    <Authors>Wastegate</Authors>
+    <Description>Библиотека для работы с СОМ портом,  WinAPI</Description>
+    <PackageTags>SerialPort; WinAPI; rs232;</PackageTags>
+    <Copyright>Wastegate</Copyright>
+    <PackageLicenseExpression> MIT-0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\wastegate\Downloads\rs232.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="System.Security.Permissions" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>
