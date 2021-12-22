@@ -40,6 +40,15 @@ namespace SerialPortService.Services
         private byte[] RxBuffer;
         private string RxString = "";
 
+        /// <summary>
+        /// Размер буфера входящих данных.
+        /// </summary>
+        private const int LenRxBuffer = 255;
+        /// <summary>
+        /// Срабатывает когда в порт поступили данные.
+        /// </summary>
+        public event Action<byte[]> DataReceived;
+
         #region Свойства.
         /// <summary>
         /// Статус порта.
@@ -60,14 +69,47 @@ namespace SerialPortService.Services
         }
         #endregion
         #region Конструктор.
+        /// <summary>
+        /// Базовый коструктор, по умолчанию инициализирует "СОМ1" baudrate=2400
+        /// </summary>
         public Serial_Port()
         {
             _settings = new BaseSettings();
         }
 
+        /// <summary>
+        /// Инициализирует порт с указаным именем порта.
+        /// </summary>
+        /// <param name="portName">Имя порта.</param>
         public Serial_Port(string portName) : this()
         {
             _settings.Port = portName;
+        }
+
+        /// <summary>
+        /// Инициализирует порт с указанным именем и скоростью.
+        /// </summary>
+        /// <param name="portName">Имя порта.</param>
+        /// <param name="speed">Скорость порта.</param>
+        public Serial_Port(string portName, int speed)
+            : this()
+        {
+            _settings.Port = portName;
+            _settings.BaudRate = speed;
+        }
+
+        /// <summary>
+        /// Инициализирует порт с указаным именем, скоростью и количеством бит данных.
+        /// </summary>
+        /// <param name="portName">Имя порта.</param>
+        /// <param name="speed">Скорость порта.</param>
+        /// <param name="dataBits">Количество бит данных.</param>
+        public Serial_Port(string portName, int speed, int dataBits)
+            : this()
+        {
+            _settings.Port = portName;
+            _settings.BaudRate = speed;
+            _settings.dataBits = dataBits;
         }
         #endregion
         #region Деструктор.
@@ -121,8 +163,12 @@ namespace SerialPortService.Services
             //return SerialPort.GetPortNames();
         }
 
-        /// <inheritdoc/>
-        public PortStatus IsPortAvailable(string portName)
+        /// <summary>
+        /// Проверяет доступность порта.
+        /// </summary>
+        /// <param name="portName">Имя порта "COM?".</param>
+        /// <returns>Статус доступности порта.</returns>
+        public static PortStatus IsPortAvailable(string portName)
         {
             IntPtr hPort = WinAPI.CreateFile(
                 portName,
@@ -380,6 +426,12 @@ namespace SerialPortService.Services
             return true;
         }
 
+        /// <inheritdoc/> 
+        public virtual void Read(byte[] data)
+        {
+            DataReceived?.Invoke(data);
+        }
+
         /// <inheritdoc/>
         public uint Write(byte[] tosend)
         {
@@ -411,6 +463,19 @@ namespace SerialPortService.Services
             }
 
             return sent;
+        }
+
+        /// <inheritdoc/>
+        public void Write(byte data)
+        {
+            byte[] buf = new byte[1];
+            buf[0] = data;
+            Write(buf);
+        }
+
+        public uint Write(string data)
+        {
+            return Write(Encoding.ASCII.GetBytes(data));
         }
 
         private void CheckResult()
@@ -452,7 +517,7 @@ namespace SerialPortService.Services
         /// </summary>
         private void ReceiveThread()
         {
-            byte[] buf = new Byte[1];
+            byte[] buf = new byte[LenRxBuffer];
             uint gotbytes;
             bool starting;
 
@@ -573,7 +638,7 @@ namespace SerialPortService.Services
                         {
                             gotbytes = 0;
 
-                            if (!WinAPI.ReadFile(hPort, buf, 1, out gotbytes, unmanagedOv))
+                            if (!WinAPI.ReadFile(hPort, buf, (uint)buf.Length, out gotbytes, unmanagedOv))
                             {
                                 //JH 1.1: Removed ERROR_IO_PENDING handling as comm timeouts have now
                                 //been set so ReadFile returns immediately. This avoids use of CancelIo
@@ -584,9 +649,18 @@ namespace SerialPortService.Services
 
                                 throw new CommPortException("IO Error [004]");
                             }
-                            if (gotbytes == 1)
+                            if (gotbytes > 0)
                             {
-                                OnRxChar(buf[0]);
+                                //OnRxChar(buf[0]);
+                                byte[] recievData = new byte[gotbytes];
+
+                                //нужно передать только прешедшие данные, а не весь массив целиком.
+                                for (int k = 0; k < gotbytes; k++)
+                                {
+                                    recievData[k] = buf[k];
+                                }
+
+                                Read(recievData); 
                             }
 
                         } while (gotbytes > 0);
@@ -607,6 +681,7 @@ namespace SerialPortService.Services
                     }
 
                     uint i = 0;
+
                     if ((eventMask & WinAPI.EV_CTS) != 0)
                     {
                         i |= WinAPI.MS_CTS_ON;
@@ -665,6 +740,7 @@ namespace SerialPortService.Services
         protected void OnRxChar(byte ch)
         {
             ASCII ca = (ASCII)ch;
+
             if ((ca == RxTerm) || (RxBufferP > RxBuffer.GetUpperBound(0)))
             {
                 //JH 1.1: Use static encoder for efficiency. Thanks to Prof. Dr. Peter Jesorsky!
@@ -672,7 +748,9 @@ namespace SerialPortService.Services
                 {
                     RxString = Encoding.ASCII.GetString(RxBuffer, 0, (int)RxBufferP);
                 }
+
                 RxBufferP = 0;
+
                 if (TransFlag.WaitOne(0, false))
                 {
                     //OnRxLine(RxString);
@@ -685,9 +763,16 @@ namespace SerialPortService.Services
             else
             {
                 bool wr = true;
+
                 if (RxFilter != null)
                 {
-                    for (int i = 0; i <= RxFilter.GetUpperBound(0); i++) if (RxFilter[i] == ca) wr = false;
+                    for (int i = 0; i <= RxFilter.GetUpperBound(0); i++)
+                    {
+                        if (RxFilter[i] == ca)
+                        {
+                            wr = false;
+                        }
+                    }
                 }
                 if (wr)
                 {
@@ -708,7 +793,7 @@ namespace SerialPortService.Services
                 rxExceptionReported = true;
                 ThrowException("rx");
             }
-            if (Online)
+            if (online)
             {
                 //JH 1.1: Avoid use of GetHandleInformation for W98 compatability.
                 if (hPort != (IntPtr)WinAPI.INVALID_HANDLE_VALUE)

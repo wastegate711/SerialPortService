@@ -20,13 +20,6 @@ namespace SerialPortService.Abstractions
         string[] GetPortName();
 
         /// <summary>
-        /// Проверяет доступность порта.
-        /// </summary>
-        /// <param name="portName">Имя порта "COM?".</param>
-        /// <returns>Статус доступности порта.</returns>
-        PortStatus IsPortAvailable(string portName);
-
-        /// <summary>
         /// Открывает СОМ порт и устанавливает настройки.
         /// </summary>
         /// <returns>Если порт открыт вернет true иначе false.</returns>
@@ -38,5 +31,29 @@ namespace SerialPortService.Abstractions
         /// <param name="tosend">Данные для записи.</param>
         /// <returns>Возвращает количество байт записаных в порт.</returns>
         uint Write(byte[] tosend);
+
+        /// <summary>
+        ///  Записывает в порт данные.
+        /// </summary>
+        /// <param name="data">Данные для записи.</param>
+        void Write(byte data);
+
+        /// <summary>
+        ///  Записывает в порт данные.
+        /// </summary>
+        /// <param name="data">Данные для записи.</param>
+        /// <returns>Возвращает количество байт записаных в порт.</returns>
+        uint Write(string data);
+
+        /// <summary>
+        /// Считывает имеющиесяя данные из порта.
+        /// </summary>
+        /// <param name="data">На вход потаются данные из порта.</param>
+        abstract void Read(byte[] data);
+
+        /// <summary>
+        /// Срабатывает когда в порт поступили данные.
+        /// </summary>
+        public event Action<byte[]> DataReceived;
     }
 }
