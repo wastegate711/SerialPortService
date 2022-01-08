@@ -1,6 +1,7 @@
 ﻿using SerialPortService.Enum;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,29 @@ namespace SerialPortService.Abstractions
 {
     public interface ISerialPortService
     {
+        /// <summary>
+        /// Статус порта.
+        /// </summary>
+        bool Online { get; }
+
+        /// <summary>
+        /// Содержит имя СОМ порта.
+        /// </summary>
+        [DefaultValue("COM1")]
+        string PortName { get; set; }
+
+        /// <summary>
+        /// Содержит скорость соединения.
+        /// </summary>
+        [DefaultValue(2400)]
+        int BaudRate { get; set; }
+
+        /// <summary>
+        /// Содержит количество передаваемых бит данных.
+        /// </summary>
+        [DefaultValue(8)] 
+        int DataBit { get; set; }
+
         /// <summary>
         /// Закрывает СОМ порт.
         /// </summary>
