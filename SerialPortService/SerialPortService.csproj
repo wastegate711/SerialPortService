@@ -15,6 +15,7 @@
     <PackageIconUrl />
     <Version>1.0.6</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <PackageProjectUrl>https://github.com/wastegate711/SerialPortService.git</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
