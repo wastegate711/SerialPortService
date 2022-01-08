@@ -2,6 +2,7 @@
 using SerialPortService.Abstractions;
 using SerialPortService.Enum;
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
@@ -65,6 +66,55 @@ namespace SerialPortService.Services
                 {
                     return CheckOnline();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Содержит имя СОМ порта.
+        /// </summary>
+        [DefaultValue("COM1")]
+        public string PortName
+        {
+            get => _settings != null ? _settings.Port : string.Empty;
+            set
+            {
+                if (_settings != null)
+                    _settings.Port = value;
+                else
+                    throw new CommPortException($"_settings=null при попытке изменить PortName.");
+
+            }
+        }
+
+        /// <summary>
+        /// Содержит скорость соединения.
+        /// </summary>
+        [DefaultValue(2400)]
+        public int BaudRate
+        {
+            get => _settings?.BaudRate ?? 0;
+            set
+            {
+                if (_settings != null)
+                    _settings.BaudRate = value;
+                else
+                    throw new CommPortException($"_settings=null при попытке установить новое значение BaudRate.");
+            }
+        }
+
+        /// <summary>
+        /// Содержит количество передаваемых бит данных.
+        /// </summary>
+        [DefaultValue(8)]
+        public int DataBit
+        {
+            get => _settings?.dataBits ?? 0;
+            set
+            {
+                if (_settings != null)
+                    _settings.dataBits = value;
+                else
+                    throw new CommPortException($"_settings=null при попытке установить значение DataBit.");
             }
         }
         #endregion
