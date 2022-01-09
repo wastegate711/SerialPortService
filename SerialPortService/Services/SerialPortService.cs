@@ -161,6 +161,65 @@ namespace SerialPortService.Services
             _settings.BaudRate = speed;
             _settings.dataBits = dataBits;
         }
+
+        /// <summary>
+        /// Инициализирует порт с указаным именем, скоростью и количеством бит данных и parity.
+        /// </summary>
+        /// <param name="portName">Имя порта.</param>
+        /// <param name="speed">Скорость.</param>
+        /// <param name="dataBit">Количество бит данных.</param>
+        /// <param name="parity">Parity.</param>
+        public Serial_Port(string portName, int speed, int dataBit, Parity parity)
+            : this()
+        {
+            _settings.Port = portName;
+            _settings.BaudRate = speed;
+            _settings.dataBits = dataBit;
+            _settings.ParityMode = parity;
+        }
+
+        /// <summary>
+        /// Инициализирует порт с указаным именем, скоростью, количеством бит данных, parity и количеством стоповых бит.
+        /// </summary>
+        /// <param name="portName">Имя порта.</param>
+        /// <param name="speed">Скорость.</param>
+        /// <param name="dataBit">Количество бит данных.</param>
+        /// <param name="parity">Parity.</param>
+        /// <param name="stopBits">Количество стоп бит.</param>
+        public Serial_Port(string portName, int speed, int dataBit, Parity parity, StopBits stopBits)
+            : this()
+        {
+            _settings.Port = portName;
+            _settings.BaudRate = speed;
+            _settings.dataBits = dataBit;
+            _settings.ParityMode = parity;
+            _settings.stopBits = stopBits;
+        }
+
+        /// <summary>
+        /// Инициализирует порт с указаным именем, скоростью, количеством бит данных,
+        /// parity, количеством стоповых бит и аппаратным контролем.
+        /// </summary>
+        /// <param name="portName">Имя порта.</param>
+        /// <param name="speed">Скорость.</param>
+        /// <param name="dataBit">Количество бит данных.</param>
+        /// <param name="parity">Parity.</param>
+        /// <param name="stopBits">Количество стоп бит.</param>
+        /// <param name="handshake">Аппаратный контроль.</param>
+        public Serial_Port(
+            string portName,
+            int speed,
+            int dataBit,
+            Parity parity,
+            StopBits stopBits,
+            Handshake handshake) : this()
+        {
+            _settings.Port = portName;
+            _settings.BaudRate = speed;
+            _settings.dataBits = dataBit;
+            _settings.ParityMode = parity;
+            _settings.stopBits = stopBits;
+        }
         #endregion
         #region Деструктор.
         public void Dispose()
@@ -710,7 +769,7 @@ namespace SerialPortService.Services
                                     recievData[k] = buf[k];
                                 }
 
-                                Read(recievData); 
+                                Read(recievData);
                             }
 
                         } while (gotbytes > 0);
