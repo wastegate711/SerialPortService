@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using SerialPortService.Abstractions;
 using SerialPortService.Services;
 
@@ -21,16 +22,18 @@ namespace ConsoleTestApp
             _serialPortService.DataReceived += SerialPortService_DataReceived;
             _serialPortService.Open();
             _serialPortService.Write(data);
-            while (true)
-            {
-                //var t = _serialPortService.Write(Console.ReadKey().KeyChar.ToString());
-                var t=Console.ReadLine();
+            Thread.Sleep(1000);
+            _serialPortService.Close();
+            //while (true)
+            //{
+            //    //var t = _serialPortService.Write(Console.ReadKey().KeyChar.ToString());
+            //    var t=Console.ReadLine();
 
-                if (t.Length > 1)
-                {
-                    _serialPortService.Write(data);
-                }
-            }
+            //    if (t.Length > 1)
+            //    {
+            //        _serialPortService.Write(data);
+            //    }
+            //}
         }
 
         private static void SerialPortService_DataReceived(byte[] obj)
