@@ -12,22 +12,25 @@
     <Copyright>Wastegate</Copyright>
     <PackageLicenseExpression> MIT-0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <PackageIconUrl />
-    <Version>1.0.7</Version>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <PackageIconUrl>https://github.com/wastegate711/SerialPortService/blob/v1.0.8/rs232.jpg</PackageIconUrl>
+    <Version>1.0.8</Version>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
     <PackageProjectUrl>https://github.com/wastegate711/SerialPortService.git</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\rs232.jpg">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
+    <None Include="Images\rs232.jpg" Pack="true" PackagePath="\">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="System.Security.Permissions" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Images\" />
   </ItemGroup>
 
 </Project>
