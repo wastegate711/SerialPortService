@@ -234,8 +234,10 @@ namespace SerialPortService.Services
         }
         #endregion
 
-        /// <inheritdoc/>
-        public string[] GetPortName()
+        /// <summary>
+        /// Возвращает список портов имеющихся в системе.
+        /// </summary>
+        public static string[] GetPortName()
         {
             string[] ports = null;
             RegistryKey registryKey1 = null;

@@ -34,11 +34,6 @@ namespace SerialPortService.Abstractions
         void Close();
 
         /// <summary>
-        /// Возвращает список портов имеющихся в системе.
-        /// </summary>
-        string[] GetPortName();
-
-        /// <summary>
         /// Открывает СОМ порт и устанавливает настройки.
         /// </summary>
         /// <returns>Если порт открыт вернет true иначе false.</returns>
