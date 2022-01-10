@@ -1,10 +1,5 @@
-﻿using SerialPortService.Enum;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SerialPortService.Abstractions
 {
@@ -78,6 +73,8 @@ namespace SerialPortService.Abstractions
         /// <summary>
         /// Срабатывает когда в порт поступили данные.
         /// </summary>
-        public event Action<byte[]> DataReceived;
+        event Action<byte[]> DataReceived;
+
+        void Dispose();
     }
 }

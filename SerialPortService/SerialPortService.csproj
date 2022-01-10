@@ -13,8 +13,8 @@
     <PackageLicenseExpression> MIT-0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageIconUrl />
-    <Version>1.0.7</Version>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <Version>1.0.8</Version>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
     <PackageProjectUrl>https://github.com/wastegate711/SerialPortService.git</PackageProjectUrl>
   </PropertyGroup>
 

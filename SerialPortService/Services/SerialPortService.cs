@@ -19,6 +19,7 @@ namespace SerialPortService.Services
         /// Поток считывающий входящие данные.
         /// </summary>
         private Thread _rxThread;
+        private CancellationTokenSource _cts = new CancellationTokenSource();
         private ManualResetEvent TransFlag = new ManualResetEvent(true);
         private ManualResetEvent writeEvent = new ManualResetEvent(false);
         private ManualResetEvent startEvent = new ManualResetEvent(false);
@@ -520,13 +521,13 @@ namespace SerialPortService.Services
             //JH1.3:
             empty[0] = true;
             dataQueued = false;
-
+            
             _rxException = null;
             rxExceptionReported = false;
-            _rxThread = new Thread(new ThreadStart(ReceiveThread));
+            _rxThread = new Thread(ReceiveThread);
             _rxThread.Name = "SerialPortReceiveData";
             _rxThread.Priority = ThreadPriority.AboveNormal;
-            _rxThread.Start();
+            _rxThread.Start(_cts.Token);
 
             //JH1.2: More robust thread start-up wait.
             startEvent.WaitOne(500, false);
@@ -624,8 +625,15 @@ namespace SerialPortService.Services
         /// <summary>
         /// Метод выполняется в отдельном потоке и считывает входящие данные.
         /// </summary>
-        private void ReceiveThread()
+        private void ReceiveThread(object cancel)
         {
+            CancellationToken cancellationToken = (CancellationToken)cancel;
+
+            if (cancellationToken == null)
+            {
+                throw new CommPortException($"cancel=null не удачная передача токена отмены в принимающий поток.");
+            }
+
             byte[] buf = new byte[LenRxBuffer];
             uint gotbytes;
             bool starting;
@@ -647,7 +655,7 @@ namespace SerialPortService.Services
 
             try
             {
-                while (true)
+                while (!cancellationToken.IsCancellationRequested)
                 {
                     if (!WinAPI.SetCommMask(hPort, WinAPI.EV_RXCHAR | WinAPI.EV_TXEMPTY | WinAPI.EV_CTS | WinAPI.EV_DSR
                         | WinAPI.EV_BREAK | WinAPI.EV_RLSD | WinAPI.EV_RING | WinAPI.EV_ERR))
@@ -936,10 +944,26 @@ namespace SerialPortService.Services
 
             if (_rxThread != null)
             {
-                _rxThread.Abort();
-                //JH 1.3: Improve robustness of Close in case were followed by Open:
-                _rxThread.Join(100);
-                _rxThread = null;
+                try
+                {
+                    _cts.Cancel();
+                    //JH 1.3: Improve robustness of Close in case were followed by Open:
+                    _rxThread.Join(100);
+                    _cts.Dispose();
+                    _rxThread = null;
+                }
+                catch (ThreadAbortException abort)
+                {
+
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+
+                }
+                catch (Exception ex)
+                {
+                    throw new CommPortException(ex.Message);
+                }
             }
 
             WinAPI.CloseHandle(hPort);
